@@ -28,10 +28,16 @@ func main() {
   breakCLog := color.New(color.FgRed, color.Bold)
   depCLog := color.New(color.FgYellow, color.Bold)
 
+  shouldFail := false
   for _, depMsg := range result.DeprecationMessages {
     depCLog.Printf("Deprecation: %s\n", depMsg)
   }
   for _, depMsg := range result.BreakingChangeMessages {
     breakCLog.Printf("Breaking Change: %s\n", depMsg)
+    shouldFail = true
+  }
+
+  if shouldFail {
+    os.Exit(1)
   }
 }
