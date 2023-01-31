@@ -44,16 +44,23 @@ break_if_mandatory_variable_was_added contains msg {
   msg := sprintf("New mandatory variable '%s' was added.", [name])
 }
 
+changed_type(operation) = type {
+  old_v := regex.replace(operation.oldValue, "\\s", "")
+  new_v := regex.replace(operation.value, "\\s", "")
+  old_v != new_v
+  type := operation.value
+}
+
 # Split to three cases (replace, add, remove)
 break_if_variable_type_has_changed contains msg {
   c := patches.variable[name]
-  type := c.type._operation.value
+  type := changed_type(c.type._operation)
   msg := sprintf("Type of variable '%s' changed to '%s'.", [name, type])
 }
 
 break_if_output_type_has_changed contains msg {
   c := patches.output[name]
-  type := c.type._operation.value
+  type := changed_type(c.type_operation)
   msg := sprintf("Type of output '%s' changed to '%s'.", [name, type])
 }
 
