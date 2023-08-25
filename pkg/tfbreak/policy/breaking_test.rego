@@ -27,7 +27,7 @@ test_break_if_variable_type_has_changed if {
 	count(msgs) == 1
 }
 
-test_break_if_variable_type_has_changed_due_to_formatting if {
+test_dont_break_if_variable_type_has_changed_due_to_formatting if {
 	old_type := `${list(object({
     key1   = string
     key2= string
@@ -54,4 +54,19 @@ test_break_if_mandatory_variable_was_added_with_optional_variable if {
 	msgs := break_if_mandatory_variable_was_added with input as changed_type
 		with data.config as {"deprecation_marker": "[Deprecated]"}
 	count(msgs) == 0
+}
+
+test_break_if_variable_type_has_changed if {
+       old_type := `${list(object({
+    key1   = string
+    key2= string
+  }))}`
+       new_type := `${list(object({
+    key1 = bool
+    key2 = string
+  }))}`
+       changed_type := {"variable": {"test": {"type": {"_operation": {"op": "replace", "from": "", "path": "/variable/test/0/type", "oldValue": old_type, "value": new_type}}}}}
+       msgs := break_if_variable_type_has_changed with input as changed_type
+               with data.config as {"deprecation_marker": "[Deprecated]"}
+       count(msgs) == 1
 }
